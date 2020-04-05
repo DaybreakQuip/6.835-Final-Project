@@ -14,6 +14,7 @@ THRESHOLD = 500
 CHUNK_SIZE = 1024
 FORMAT = pyaudio.paInt16
 RATE = 44000
+RECORD_TIME = 5
 
 def is_silent(snd_data):
     "Returns 'True' if below the 'silent' threshold"
@@ -81,11 +82,11 @@ def record():
     start = time.time()
     end = start
     record_time = 5
-    print(f"recording for {record_time} seconds")
+    print(f"recording for {RECORD_TIME} seconds")
 
     r = array('h')
     x = ""
-    while (end - start <= record_time):
+    while (end - start <= RECORD_TIME):
         # little endian, signed short
         snd_data = array('h', stream.read(CHUNK_SIZE))
         if byteorder == 'big':
