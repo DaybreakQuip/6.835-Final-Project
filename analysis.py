@@ -7,31 +7,31 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 # Note filename must be in same directory as myspsolution.praat
 
 
-def get_speech_rate(filename):
+def get_speech_rate(filename="record_tmp"):
     mysp.mypssr(filename, dir_path)
 
 
-def get_summary(filename):
+def get_summary(filename="record_tmp"):
     mysp.mysptotal(filename, dir_path)
 
 
-def get_articulation_rate(filename):
+def get_articulation_rate(filename="record_tmp"):
     mysp.myspatc(filename, dir_path)
 
 
-def get_num_pauses(filename):
+def get_num_pauses(filename="record_tmp"):
     mysp.mysppaus(filename, dir_path)
 
 
-def get_num_syllables(filename):
+def get_num_syllables(filename="record_tmp"):
     mysp.myspsyl(filename, dir_path)
 
 
-def get_gender(filename):
+def get_gender(filename="record_tmp"):
     mysp.myspgend(filename, dir_path)
 
 
-def get_words(filename):
+def get_words(filename="record_tmp"):
     AUDIO_FILE = (filename + ".wav")
     # use the audio file as the audio source
 

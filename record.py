@@ -113,13 +113,13 @@ def record():
     r = add_silence(r, 0.5)
     return sample_width, r
 
-def record_to_file(path):
-    "Records from the microphone and outputs the resulting data to 'path'"
+def record_to_file(filename="record_tmp"):
+    "Records from the microphone and outputs the resulting data to 'filename'"
     print("recording...")
     sample_width, data = record()
     data = pack('<' + ('h'*len(data)), *data)
 
-    wf = wave.open(path, 'wb')
+    wf = wave.open(filename, 'wb')
     wf.setnchannels(1)
     wf.setsampwidth(sample_width)
     wf.setframerate(RATE)
