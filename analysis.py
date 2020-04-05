@@ -3,5 +3,5 @@ import os
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
-p="Walkers" # Audio File title
-mysp.mysptotal(p,dir_path)
+p="recording_tmp" # Audio File title
+mysp.mysppaus(p,dir_path)
