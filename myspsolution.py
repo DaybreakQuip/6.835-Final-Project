@@ -18,13 +18,14 @@ def myspsyl(m,p):
         print (objects[0]) # This will print the info from the sound object, and objects[0] is a parselmouth.Sound object
         z1=str( objects[1]) # This will print the info from the textgrid object, and objects[1] is a parselmouth.Data object with a TextGrid inside
         z2=z1.strip().split()
-        z3=int(z2[0]) # will be the integer number 10
+        z3=(z2[0]) # will be the integer number 10
         z4=float(z2[3]) # will be the floating point number 8.3
         print ("number_ of_syllables=",z3)
-    except:
+    except Exception as e:
+        print(e)
         z3=0
         print ("Try again the sound of the audio was not clear")
-    return; 
+    return 
 
 def mysppaus(m,p):
     sound=p+"/"+m+".wav"
@@ -35,13 +36,14 @@ def mysppaus(m,p):
         print (objects[0]) # This will print the info from the sound object, and objects[0] is a parselmouth.Sound object
         z1=str( objects[1]) # This will print the info from the textgrid object, and objects[1] is a parselmouth.Data object with a TextGrid inside
         z2=z1.strip().split()
-        z3=int(z2[1]) # will be the integer number 10
+        z3=(z2[1]) # will be the integer number 10
         z4=float(z2[3]) # will be the floating point number 8.3
         print ("number_of_pauses=",z3)
-    except:
+    except Exception as e:
+        print(e)
         z3=0
         print ("Try again the sound of the audio was not clear")
-    return; 
+    return 
 
 def myspsr(m,p):
     sound=p+"/"+m+".wav"
@@ -52,13 +54,14 @@ def myspsr(m,p):
         print (objects[0]) # This will print the info from the sound object, and objects[0] is a parselmouth.Sound object
         z1=str( objects[1]) # This will print the info from the textgrid object, and objects[1] is a parselmouth.Data object with a TextGrid inside
         z2=z1.strip().split()
-        z3=int(z2[2]) # will be the integer number 10
+        z3=(z2[2]) # will be the integer number 10
         z4=float(z2[3]) # will be the floating point number 8.3
         print ("rate_of_speech=",z3,"# syllables/sec original duration")
-    except:
+    except Exception as e:
+        print(e)
         z3=0
         print ("Try again the sound of the audio was not clear")
-    return;
+    return
 
 def myspatc(m,p):
     sound=p+"/"+m+".wav"
@@ -69,13 +72,14 @@ def myspatc(m,p):
         print (objects[0]) # This will print the info from the sound object, and objects[0] is a parselmouth.Sound object
         z1=str( objects[1]) # This will print the info from the textgrid object, and objects[1] is a parselmouth.Data object with a TextGrid inside
         z2=z1.strip().split()
-        z3=int(z2[3]) # will be the integer number 10
+        z3=(z2[3]) # will be the integer number 10
         z4=float(z2[3]) # will be the floating point number 8.3
         print ("articulation_rate=",z3,"# syllables/sec speaking duration")
-    except:
+    except Exception as e:
+        print(e)
         z3=0
         print ("Try again the sound of the audio was not clear")
-    return;
+    return
 
 def myspst(m,p):
     sound=p+"/"+m+".wav"
@@ -86,13 +90,14 @@ def myspst(m,p):
         print (objects[0]) # This will print the info from the sound object, and objects[0] is a parselmouth.Sound object
         z1=str( objects[1]) # This will print the info from the textgrid object, and objects[1] is a parselmouth.Data object with a TextGrid inside
         z2=z1.strip().split()
-        z3=int(z2[3]) # will be the integer number 10
+        z3=(z2[3]) # will be the integer number 10
         z4=float(z2[4]) # will be the floating point number 8.3
         print ("speaking_duration=",z4,"# sec only speaking duration without pauses")
-    except:
+    except Exception as e:
+        print(e)
         z4=0
         print ("Try again the sound of the audio was not clear")
-    return;
+    return
 
 def myspod(m,p):
     sound=p+"/"+m+".wav"
@@ -103,13 +108,14 @@ def myspod(m,p):
         print (objects[0]) # This will print the info from the sound object, and objects[0] is a parselmouth.Sound object
         z1=str( objects[1]) # This will print the info from the textgrid object, and objects[1] is a parselmouth.Data object with a TextGrid inside
         z2=z1.strip().split()
-        z3=int(z2[3]) # will be the integer number 10
+        z3=(z2[3]) # will be the integer number 10
         z4=float(z2[5]) # will be the floating point number 8.3
         print ("original_duration=",z4,"# sec total speaking duration with pauses")
-    except:
+    except Exception as e:
+        print(e)
         z4=0
         print ("Try again the sound of the audio was not clear")
-    return;
+    return
 
 def myspbala(m,p):
     sound=p+"/"+m+".wav"
@@ -120,13 +126,14 @@ def myspbala(m,p):
         print (objects[0]) # This will print the info from the sound object, and objects[0] is a parselmouth.Sound object
         z1=str( objects[1]) # This will print the info from the textgrid object, and objects[1] is a parselmouth.Data object with a TextGrid inside
         z2=z1.strip().split()
-        z3=int(z2[3]) # will be the integer number 10
+        z3=(z2[3]) # will be the integer number 10
         z4=float(z2[6]) # will be the floating point number 8.3
         print ("balance=",z4,"# ratio (speaking duration)/(original duration)")
-    except:
+    except Exception as e:
+        print(e)
         z4=0
         print ("Try again the sound of the audio was not clear")
-    return;
+    return
 
 def myspf0mean(m,p):
     sound=p+"/"+m+".wav"
@@ -137,13 +144,14 @@ def myspf0mean(m,p):
         print (objects[0]) # This will print the info from the sound object, and objects[0] is a parselmouth.Sound object
         z1=str( objects[1]) # This will print the info from the textgrid object, and objects[1] is a parselmouth.Data object with a TextGrid inside
         z2=z1.strip().split()
-        z3=int(z2[3]) # will be the integer number 10
+        z3=(z2[3]) # will be the integer number 10
         z4=float(z2[7]) # will be the floating point number 8.3
         print ("f0_mean=",z4,"# Hz global mean of fundamental frequency distribution")
-    except:
+    except Exception as e:
+        print(e)
         z4=0
         print ("Try again the sound of the audio was not clear")
-    return;
+    return
 
 def myspf0sd(m,p):
     sound=p+"/"+m+".wav"
@@ -154,13 +162,14 @@ def myspf0sd(m,p):
         print (objects[0]) # This will print the info from the sound object, and objects[0] is a parselmouth.Sound object
         z1=str( objects[1]) # This will print the info from the textgrid object, and objects[1] is a parselmouth.Data object with a TextGrid inside
         z2=z1.strip().split()
-        z3=int(z2[3]) # will be the integer number 10
+        z3=(z2[3]) # will be the integer number 10
         z4=float(z2[8]) # will be the floating point number 8.3
         print ("f0_SD=",z4,"# Hz global standard deviation of fundamental frequency distribution")
-    except:
+    except Exception as e:
+        print(e)
         z4=0
         print ("Try again the sound of the audio was not clear")
-    return;
+    return
 
 def myspf0med(m,p):
     sound=p+"/"+m+".wav"
@@ -171,13 +180,14 @@ def myspf0med(m,p):
         print (objects[0]) # This will print the info from the sound object, and objects[0] is a parselmouth.Sound object
         z1=str( objects[1]) # This will print the info from the textgrid object, and objects[1] is a parselmouth.Data object with a TextGrid inside
         z2=z1.strip().split()
-        z3=int(z2[3]) # will be the integer number 10
+        z3=(z2[3]) # will be the integer number 10
         z4=float(z2[9]) # will be the floating point number 8.3
         print ("f0_MD=",z4,"# Hz global median of fundamental frequency distribution")
-    except:
+    except Exception as e:
+        print(e)
         z4=0
         print ("Try again the sound of the audio was not clear")
-    return;
+    return
 
 def myspf0min(m,p):
     sound=p+"/"+m+".wav"
@@ -188,13 +198,14 @@ def myspf0min(m,p):
         print (objects[0]) # This will print the info from the sound object, and objects[0] is a parselmouth.Sound object
         z1=str( objects[1]) # This will print the info from the textgrid object, and objects[1] is a parselmouth.Data object with a TextGrid inside
         z2=z1.strip().split()
-        z3=int(z2[10]) # will be the integer number 10
+        z3=(z2[10]) # will be the integer number 10
         z4=float(z2[10]) # will be the floating point number 8.3
         print ("f0_min=",z3,"# Hz global minimum of fundamental frequency distribution")
-    except:
+    except Exception as e:
+        print(e)
         z3=0
         print ("Try again the sound of the audio was not clear") 
-    return;
+    return
 
 def myspf0max(m,p):
     sound=p+"/"+m+".wav"
@@ -205,13 +216,14 @@ def myspf0max(m,p):
         print (objects[0]) # This will print the info from the sound object, and objects[0] is a parselmouth.Sound object
         z1=str( objects[1]) # This will print the info from the textgrid object, and objects[1] is a parselmouth.Data object with a TextGrid inside
         z2=z1.strip().split()
-        z3=int(z2[11]) # will be the integer number 10
+        z3=(z2[11]) # will be the integer number 10
         z4=float(z2[11]) # will be the floating point number 8.3
         print ("f0_max=",z3,"# Hz global maximum of fundamental frequency distribution")
-    except:
+    except Exception as e:
+        print(e)
         z3=0
         print ("Try again the sound of the audio was not clear")
-    return;
+    return
 
 def myspf0q25(m,p):
     sound=p+"/"+m+".wav"
@@ -222,13 +234,14 @@ def myspf0q25(m,p):
         print (objects[0]) # This will print the info from the sound object, and objects[0] is a parselmouth.Sound object
         z1=str( objects[1]) # This will print the info from the textgrid object, and objects[1] is a parselmouth.Data object with a TextGrid inside
         z2=z1.strip().split()
-        z3=int(z2[12]) # will be the integer number 10
+        z3=(z2[12]) # will be the integer number 10
         z4=float(z2[11]) # will be the floating point number 8.3
         print ("f0_quan25=",z3,"# Hz global 25th quantile of fundamental frequency distribution")
-    except:
+    except Exception as e:
+        print(e)
         z3=0
         print ("Try again the sound of the audio was not clear")
-    return;
+    return
 
 def myspf0q75(m,p):
     sound=p+"/"+m+".wav"
@@ -239,13 +252,14 @@ def myspf0q75(m,p):
         print (objects[0]) # This will print the info from the sound object, and objects[0] is a parselmouth.Sound object
         z1=str( objects[1]) # This will print the info from the textgrid object, and objects[1] is a parselmouth.Data object with a TextGrid inside
         z2=z1.strip().split()
-        z3=int(z2[13]) # will be the integer number 10
+        z3=(z2[13]) # will be the integer number 10
         z4=float(z2[11]) # will be the floating point number 8.3
         print ("f0_quan75=",z3,"# Hz global 75th quantile of fundamental frequency distribution")
-    except:
+    except Exception as e:
+        print(e)
         z3=0
         print ("Try again the sound of the audio was not clear")
-    return;
+    return
 
 def mysptotal(m,p):
     sound=p+"/"+m+".wav"
@@ -263,9 +277,10 @@ def mysptotal(m,p):
                           "original_duration":z5[5,:],"balance":z5[6,:],"f0_mean":z5[7,:],"f0_std":z5[8,:],"f0_median":z5[9,:],"f0_min":z5[10,:],"f0_max":z5[11,:],
                           "f0_quantile25":z5[12,:],"f0_quan75":z5[13,:]})
         print (dataset.T)
-    except:
+    except Exception as e:
+        print(e)
         print ("Try again the sound of the audio was not clear")
-    return;
+    return
 
 def mysppron(m,p):
     sound=p+"/"+m+".wav"
@@ -276,15 +291,16 @@ def mysppron(m,p):
         print (objects[0]) # This will print the info from the sound object, and objects[0] is a parselmouth.Sound object
         z1=str( objects[1]) # This will print the info from the textgrid object, and objects[1] is a parselmouth.Data object with a TextGrid inside
         z2=z1.strip().split()
-        z3=int(z2[13]) # will be the integer number 10
+        z3=(z2[13]) # will be the integer number 10
         z4=float(z2[14]) # will be the floating point number 8.3
         db= binom.rvs(n=10,p=z4,size=10000)
         a=np.array(db)
         b=np.mean(a)*100/10
         print ("Pronunciation_posteriori_probability_score_percentage= :%.2f" % (b))
-    except:
+    except Exception as e:
+        print(e)
         print ("Try again the sound of the audio was not clear")
-    return;
+    return
 
 def myspgend(m,p):
     sound=p+"/"+m+".wav"
@@ -351,5 +367,6 @@ def myspgend(m,p):
             print("a female, mood of speech: speaking passionately, p-value/sample size= :%.2f" % (mmm), (nnn))
         else:
             print("Voice not recognized")
-    except:
+    except Exception as e:
+        print(e)
         print ("Try again the sound of the audio was not clear")
