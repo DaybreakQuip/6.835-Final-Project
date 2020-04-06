@@ -3,7 +3,7 @@ import os
 import time
 import tkinter
 
-from analysis import *
+from text_analysis import *
 from speaker import *
 from utils import *
 import os
