@@ -20,7 +20,9 @@ tmp_prefix_name = "recording_"
 desired_rate = 150
 
 def get_live_feedback(filename, criteria={}):
-    check_speech_rate(filename, desired_rate)
+    feedback_thread = threading.Thread(target=check_speech_rate,args=(filename,desired_rate))
+    #check_speech_rate(filename, desired_rate)
+    feedback_thread.start()
     
 def record_thread():
     global counter
