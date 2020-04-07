@@ -31,7 +31,7 @@ def record_thread():
         record_to_file(tmp_prefix_name + str(counter))
         get_live_feedback(f"{tmp_prefix_name}{counter}") if live_feedback_on else None
         counter += 1
-    switch.configure(text="Start", command=start_command, state=NORMAL)
+    switch.configure(text="Start", command=start_command, state=NORMAL, bg="#BBFAC7")
     runner2 = threading.Thread(target=stop_thread,args=())
     runner2.start()
 
@@ -52,7 +52,7 @@ def start_command():
     global runner1
     runner1 = threading.Thread(target=record_thread,args=())
     runner1.start()
-    switch.configure(text="Stop", command=stop_command)
+    switch.configure(text="Stop", command=stop_command,bg="#FF7B5D")
 
 def stop_command():
     global runner1
@@ -71,8 +71,11 @@ positionRight = int(root.winfo_screenwidth()/2 - windowWidth/2) - 60
 positionDown = int(root.winfo_screenheight()/4 - windowHeight/4) - 50
 
 root.geometry("300x600""+{}+{}".format(positionRight, positionDown))
-switch = Button(root, text='Start', height=2, width= 20, command=start_command)
-settings = Button(root, text='Settings', height=2, width=30)
+title = Label(root, text="6.UAssist")
+title.config(font=("Courier", 35))
+switch = Button(root, text='Start', height=2, width= 20, command=start_command, bg="#BBFAC7")
+settings = Button(root, text='Settings', height=2, width=30, bg="#AEAEAE")
+title.pack(side=TOP, pady = 130)
 settings.pack(side=BOTTOM, pady=5)
 switch.pack(side=BOTTOM, pady=5)
 
