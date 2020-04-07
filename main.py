@@ -7,13 +7,10 @@ from text_analysis import *
 from gesture_analysis import *
 from speaker import *
 from utils import *
+from MultiThreading import *
 import os
 
 COUNTER = 0
-
-def run_GUI():
-    pass 
-
 
 def main():
     load_speech("6UAssist is starting...")

@@ -64,7 +64,12 @@ def check_speech_rate(filename, desired_rate):
 def check_filler_words(filename, filler_words=[]):
     if filler_words:
         words = get_words(filename)
-        return dict(zip(filler_words, [words.count(filler) for filler in filler_words]))
+        illegals = set(words).intersection(filler_words)
+        if illegals:
+            load_speech(f"Careful, you said the word {', '.join(illegals[:-1])} and {illegals[-1]}.")
+            unload_speech()
+    else:
+        pass
 
 def compose_text_summary(criterion={"speech_rate": True, "filler_words": True}):
     msg = []

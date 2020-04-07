@@ -25,7 +25,6 @@ def stop_thread():
     for i in range(last_file_counter, counter):
         os.remove(dir_path + "\\recording_" + str(i) + ".wav")
     last_file_counter = temp
-    print("stopped deleting")
 
 def start_command():
     global runner1

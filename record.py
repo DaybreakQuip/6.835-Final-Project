@@ -114,7 +114,6 @@ def record():
     return sample_width, r
 
 def record_to_file(filename="record_tmp"):
-    start = time.time()
     "Records from the microphone and outputs the resulting data to 'filename'"
     # print("recording...")
     sample_width, data = record()
@@ -126,4 +125,3 @@ def record_to_file(filename="record_tmp"):
     wf.setframerate(RATE)
     wf.writeframes(data)
     wf.close()
-    print(time.time() - start)
