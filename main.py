@@ -24,7 +24,7 @@ def record_thread():
     runner2 = threading.currentThread()
     while getattr(runner2, "do_run", True):
         record_to_file(tmp_prefix_name + str(counter))
-        check_speech_rate(f"{tmp_prefix_name}{0 if counter == 0 else counter - 1}", desired_rate)
+        check_speech_rate(f"{tmp_prefix_name}{counter}", desired_rate)
         counter += 1
     switch.configure(text="Start", command=start_command, state=NORMAL)
     runner2 = threading.Thread(target=stop_thread,args=())
