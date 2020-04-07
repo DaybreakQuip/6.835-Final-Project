@@ -81,8 +81,8 @@ def record():
     # snd_started = False
     start = time.time()
     end = start
-    record_time = 5
-    print(f"recording for {RECORD_TIME} seconds")
+
+    # print(f"recording for {RECORD_TIME} seconds")
 
     r = array('h')
     x = ""
@@ -114,14 +114,16 @@ def record():
     return sample_width, r
 
 def record_to_file(filename="record_tmp"):
+    start = time.time()
     "Records from the microphone and outputs the resulting data to 'filename'"
-    print("recording...")
+    # print("recording...")
     sample_width, data = record()
     data = pack('<' + ('h'*len(data)), *data)
 
-    wf = wave.open(filename, 'wb')
+    wf = wave.open(filename + ".wav", 'wb')
     wf.setnchannels(1)
     wf.setsampwidth(sample_width)
     wf.setframerate(RATE)
     wf.writeframes(data)
     wf.close()
+    print(time.time() - start)

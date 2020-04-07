@@ -4,6 +4,7 @@ import time
 import tkinter
 
 from text_analysis import *
+from gesture_analysis import *
 from speaker import *
 from utils import *
 import os
@@ -23,7 +24,6 @@ def main():
 
     load_speech("Thank you for using 6UAssist")
     unload_speech()
-
     # os.remove(DATA_FILENAME) # remove data file of user
 
 if __name__ == '__main__':
