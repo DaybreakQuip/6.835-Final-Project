@@ -12,27 +12,27 @@ filler_words = ["so", "um", "like", "literally", "basically", "well"]
 def convert_to_words_per_min(syllables_per_sec):
     return syllables_per_sec*60/AVERAGE_SYLLABLES_PER_WORD
 
-def get_speech_rate(filename="record_tmp"):
+def get_speech_rate(filename="recording_"):
    return float(mysp.myspsr(filename, dir_path))
 
 
-def get_summary(filename="record_tmp"):
+def get_summary(filename="recording_"):
    return mysp.mysptotal(filename, dir_path)
 
 
-def get_articulation_rate(filename="record_tmp"):
+def get_articulation_rate(filename="recording_"):
    return float(mysp.myspatc(filename, dir_path))
 
 
-def get_num_pauses(filename="record_tmp"):
+def get_num_pauses(filename="recording_"):
    return float(mysp.mysppaus(filename, dir_path))
 
 
-def get_num_syllables(filename="record_tmp"):
+def get_num_syllables(filename="recording_"):
    return float(mysp.myspsyl(filename, dir_path))
 
 
-def get_words(filename="record_tmp"):
+def get_words(filename="recording_"):
     AUDIO_FILE = (filename + ".wav")
     # use the audio file as the audio source
 
