@@ -5,6 +5,7 @@ import os
 
 AVERAGE_SYLLABLES_PER_WORD = 1
 dir_path = os.path.dirname(os.path.realpath(__file__))
+filler_words = ["so", "um", "like", "literally", "basically", "well"]
 
 # Note filename must be in same directory as myspsolution.praat
 
@@ -44,12 +45,15 @@ def get_words(filename="record_tmp"):
 
     try:
         print("The audio file contains: " + r.recognize_google(audio))
+        return r.recognize_google(audio)
 
     except sr.UnknownValueError:
         print("Google Speech Recognition could not understand audio")
 
     except sr.RequestError as e:
         print(f"Could not request results from Google Speech Recognition service; {e} ")
+
+    return
 
 def check_speech_rate(filename, desired_rate):
     print(filename)
@@ -59,10 +63,11 @@ def check_speech_rate(filename, desired_rate):
         load_speech("You are speaking too fast. Speak slower.")
         unload_speech()
 
-def check_filler_words(filename, filler_words=[]):
+def check_filler_words(filename, filler_words=filler_words):
     if filler_words:
-        words = get_words(filename)
-        illegals = set(words).intersection(filler_words)
+        words = get_words(filename).split(" ")
+        print(words)
+        illegals = list(set(words).intersection(filler_words))
         if illegals:
             load_speech(f"Careful, you said the word {', '.join(illegals[:-1])} and {illegals[-1]}.")
             unload_speech()
