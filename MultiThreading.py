@@ -14,6 +14,7 @@ def record_thread():
     while getattr(runner2, "do_run", True):
         record_to_file("recording_" + str(counter))
         counter += 1
+    switch.configure(text="Start", command=start_command, state=NORMAL)
     runner2 = threading.Thread(target=stop_thread,args=())
     runner2.start()
 
@@ -36,7 +37,7 @@ def start_command():
 def stop_command():
     global runner1
     runner1.do_run = False
-    switch.configure(text="Start", command=start_command)
+    switch.config(text="Processing", state="disabled")
 
 root = Tk()
 windowWidth = root.winfo_reqwidth()
