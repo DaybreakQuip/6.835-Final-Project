@@ -15,11 +15,16 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 runner1 = None
 counter = 0
 last_file_counter = 0
+live_feedback_on = True
+tmp_prefix_name = "recording_"
+desired_rate = 150
+
 def record_thread():
     global counter
     runner2 = threading.currentThread()
     while getattr(runner2, "do_run", True):
-        record_to_file("recording_" + str(counter))
+        record_to_file(tmp_prefix_name + str(counter))
+        check_speech_rate(f"{tmp_prefix_name}{0 if counter == 0 else counter - 1}", desired_rate)
         counter += 1
     switch.configure(text="Start", command=start_command, state=NORMAL)
     runner2 = threading.Thread(target=stop_thread,args=())
@@ -31,7 +36,11 @@ def stop_thread():
     temp = counter
     runner1 = threading.currentThread()
     for i in range(last_file_counter, counter):
-        os.remove(dir_path + "\\recording_" + str(i) + ".wav")
+        try:
+            os.remove(dir_path + f"\\{tmp_prefix_name}" + str(i) + ".wav")
+            os.remove(dir_path + f"\\{tmp_prefix_name}" + str(i) + ".TextGrid")
+        except:
+            print("Unable to find/delete certain tmp files")
     last_file_counter = temp
 
 def start_command():
@@ -44,7 +53,10 @@ def stop_command():
     global runner1
     runner1.do_run = False
     switch.config(text="Processing", state="disabled")
-
+    try:
+        os.remove(dir_path + "\\data.csv")
+    except:
+        print("Unable to delete summary.csv, most likely it doesn't exist.")
 
 
 root = Tk()

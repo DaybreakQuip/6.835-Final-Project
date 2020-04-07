@@ -3,16 +3,16 @@ import speech_recognition as sr
 from speaker import *
 import os
 
-AVERAGE_SYLLABLES_PER_WORD = 2
+AVERAGE_SYLLABLES_PER_WORD = 1
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
 # Note filename must be in same directory as myspsolution.praat
 
 def convert_to_words_per_min(syllables_per_sec):
-    return syllables_per_sec*60*AVERAGE_SYLLABLES_PER_WORD
+    return syllables_per_sec*60/AVERAGE_SYLLABLES_PER_WORD
 
 def get_speech_rate(filename="record_tmp"):
-   return mysp.mypssr(filename, dir_path)
+   return float(mysp.myspsr(filename, dir_path))
 
 
 def get_summary(filename="record_tmp"):
@@ -20,19 +20,15 @@ def get_summary(filename="record_tmp"):
 
 
 def get_articulation_rate(filename="record_tmp"):
-   return mysp.myspatc(filename, dir_path)
+   return float(mysp.myspatc(filename, dir_path))
 
 
 def get_num_pauses(filename="record_tmp"):
-   return mysp.mysppaus(filename, dir_path)
+   return float(mysp.mysppaus(filename, dir_path))
 
 
 def get_num_syllables(filename="record_tmp"):
-   return mysp.myspsyl(filename, dir_path)
-
-
-def get_gender(filename="record_tmp"):
-   return mysp.myspgend(filename, dir_path)
+   return float(mysp.myspsyl(filename, dir_path))
 
 
 def get_words(filename="record_tmp"):
@@ -56,7 +52,9 @@ def get_words(filename="record_tmp"):
         print(f"Could not request results from Google Speech Recognition service; {e} ")
 
 def check_speech_rate(filename, desired_rate):
+    print(filename)
     sr = convert_to_words_per_min(get_speech_rate(filename))
+    print(sr)
     if sr > desired_rate:
         load_speech("You are speaking too fast. Speak slower.")
         unload_speech()

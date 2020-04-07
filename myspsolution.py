@@ -38,9 +38,9 @@ def myspsyl(m, p):
         print("number_ of_syllables=", z3)
     except Exception as e:
         print(e)
-        z3 = 0
+        z3 = None
         print("Try again the sound of the audio was not clear")
-    return
+    return z3
 
 
 def mysppaus(m, p):
@@ -71,9 +71,9 @@ def mysppaus(m, p):
         print("number_of_pauses=", z3)
     except Exception as e:
         print(e)
-        z3 = 0
+        z3 = None
         print("Try again the sound of the audio was not clear")
-    return
+    return z3
 
 
 def myspsr(m, p):
@@ -104,9 +104,9 @@ def myspsr(m, p):
         print("rate_of_speech=", z3, "# syllables/sec original duration")
     except Exception as e:
         print(e)
-        z3 = 0
+        z3 = None
         print("Try again the sound of the audio was not clear")
-    return
+    return z3
 
 
 def myspatc(m, p):
@@ -137,9 +137,9 @@ def myspatc(m, p):
         print("articulation_rate=", z3, "# syllables/sec speaking duration")
     except Exception as e:
         print(e)
-        z3 = 0
+        z3 = None
         print("Try again the sound of the audio was not clear")
-    return
+    return z3
 
 
 def myspst(m, p):
@@ -171,9 +171,9 @@ def myspst(m, p):
               "# sec only speaking duration without pauses")
     except Exception as e:
         print(e)
-        z4 = 0
+        z4 = None
         print("Try again the sound of the audio was not clear")
-    return
+    return z4
 
 
 def myspod(m, p):
@@ -205,9 +205,9 @@ def myspod(m, p):
               "# sec total speaking duration with pauses")
     except Exception as e:
         print(e)
-        z4 = 0
+        z4 = None
         print("Try again the sound of the audio was not clear")
-    return
+    return z4
 
 
 def myspbala(m, p):
@@ -239,9 +239,9 @@ def myspbala(m, p):
               "# ratio (speaking duration)/(original duration)")
     except Exception as e:
         print(e)
-        z4 = 0
+        z4 = None
         print("Try again the sound of the audio was not clear")
-    return
+    return z4
 
 
 def myspf0mean(m, p):
@@ -273,9 +273,9 @@ def myspf0mean(m, p):
               "# Hz global mean of fundamental frequency distribution")
     except Exception as e:
         print(e)
-        z4 = 0
+        z4 = None
         print("Try again the sound of the audio was not clear")
-    return
+    return z4
 
 
 def myspf0sd(m, p):
@@ -309,9 +309,9 @@ def myspf0sd(m, p):
         )
     except Exception as e:
         print(e)
-        z4 = 0
+        z4 = None
         print("Try again the sound of the audio was not clear")
-    return
+    return z4
 
 
 def myspf0med(m, p):
@@ -343,9 +343,9 @@ def myspf0med(m, p):
               "# Hz global median of fundamental frequency distribution")
     except Exception as e:
         print(e)
-        z4 = 0
+        z4 = None
         print("Try again the sound of the audio was not clear")
-    return
+    return z4
 
 
 def myspf0min(m, p):
@@ -377,9 +377,9 @@ def myspf0min(m, p):
               "# Hz global minimum of fundamental frequency distribution")
     except Exception as e:
         print(e)
-        z3 = 0
+        z3 = None
         print("Try again the sound of the audio was not clear")
-    return
+    return z3
 
 
 def myspf0max(m, p):
@@ -411,9 +411,9 @@ def myspf0max(m, p):
               "# Hz global maximum of fundamental frequency distribution")
     except Exception as e:
         print(e)
-        z3 = 0
+        z3 = None
         print("Try again the sound of the audio was not clear")
-    return
+    return z3
 
 
 def myspf0q25(m, p):
@@ -446,9 +446,9 @@ def myspf0q25(m, p):
             "# Hz global 25th quantile of fundamental frequency distribution")
     except Exception as e:
         print(e)
-        z3 = 0
+        z3 = None
         print("Try again the sound of the audio was not clear")
-    return
+    return z3
 
 
 def myspf0q75(m, p):
@@ -481,9 +481,9 @@ def myspf0q75(m, p):
             "# Hz global 75th quantile of fundamental frequency distribution")
     except Exception as e:
         print(e)
-        z3 = 0
+        z3 = None
         print("Try again the sound of the audio was not clear")
-    return
+    return z3
 
 
 def mysptotal(m, p):
@@ -529,6 +529,7 @@ def mysptotal(m, p):
             "f0_quan75": z5[13, :]
         })
         print(dataset.T)
+        return dataset.T
     except Exception as e:
         print(e)
         print("Try again the sound of the audio was not clear")
@@ -565,6 +566,7 @@ def mysppron(m, p):
         b = np.mean(a) * 100 / 10
         print("Pronunciation_posteriori_probability_score_percentage= :%.2f" %
               (b))
+        return b
     except Exception as e:
         print(e)
         print("Try again the sound of the audio was not clear")

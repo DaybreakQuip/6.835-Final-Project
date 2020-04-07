@@ -13,9 +13,6 @@ password = ""
 
 # This is an example message."""
 
-def clean_tmps():
-    pass
-
 def send_emails(filename, message, emails=[]):
     # TODO allow unsecure apps to run in sender email. Otherwise, this won't work
     # unless we use OAuth2
