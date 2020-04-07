@@ -19,12 +19,15 @@ live_feedback_on = True
 tmp_prefix_name = "recording_"
 desired_rate = 150
 
+def get_live_feedback(filename, criteria={}):
+    check_speech_rate(filename, desired_rate)
+    
 def record_thread():
     global counter
     runner2 = threading.currentThread()
     while getattr(runner2, "do_run", True):
         record_to_file(tmp_prefix_name + str(counter))
-        check_speech_rate(f"{tmp_prefix_name}{counter}", desired_rate)
+        get_live_feedback(f"{tmp_prefix_name}{counter}") if live_feedback_on else None
         counter += 1
     switch.configure(text="Start", command=start_command, state=NORMAL)
     runner2 = threading.Thread(target=stop_thread,args=())
