@@ -5,10 +5,10 @@ import threading
 from tkinter import *
 
 from text_analysis import *
-from gesture_analysis import *
+from gesture_sentiment_analysis import *
+from mailer import *
 from speaker import *
 from utils import *
-import os
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -19,17 +19,38 @@ live_feedback_on = True
 tmp_prefix_name = "recording_"
 desired_rate = 150
 
+bgModel = cv2.createBackgroundSubtractorMOG2(0, bgSubThreshold)
+time.sleep(2)
+camera = cv2.VideoCapture(0)
+camera.set(10, 200)
+
+gesture_model_filename = './VGG_cross_validated.h5'
+sentiment_model_filename = "./sentiment_model.h5"
+gesture_model, gesture_graph, gesture_session = init_keras_thread(gesture_model_filename)
+sentiment_model, sentiment_graph, sentiment_session = init_keras_thread(sentiment_model_filename)
+
 def get_live_feedback(filename, criteria={}):
     feedback_thread = threading.Thread(target=check_speech_rate,args=(filename,desired_rate))
-    #check_speech_rate(filename, desired_rate)
     feedback_thread.start()
-    
+
+def get_gesture_feedback():
+    gesture_thread = threading.Thread(target=analyze_gesture,args=(capture_image(camera, bgModel), \
+        gesture_model, gesture_graph, gesture_session))
+    gesture_thread.start()
+
+def get_sentiment_feedback():
+    sentiment_thread = threading.Thread(target=analyze_sentiment,args=(capture_image(camera, bgModel, mode="sentiment"), \
+        sentiment_model, sentiment_graph, sentiment_session))
+    sentiment_thread.start()
+
 def record_thread():
     global counter
     runner2 = threading.currentThread()
     while getattr(runner2, "do_run", True):
         record_to_file(tmp_prefix_name + str(counter))
         get_live_feedback(f"{tmp_prefix_name}{counter}") if live_feedback_on else None
+        # get_gesture_feedback() if camera.isOpened() else None
+        # get_sentiment_feedback() if camera.isOpened() else None
         counter += 1
     switch.configure(text="Start", command=start_command, state=NORMAL, bg="#BBFAC7")
     runner2 = threading.Thread(target=stop_thread,args=())
@@ -47,6 +68,9 @@ def stop_thread():
         except:
             print("Unable to find/delete certain tmp files")
     last_file_counter = temp
+    
+    if CAN_SEND_EMAIL:
+        send_message(compose_message())
 
 def start_command():
     global runner1
@@ -78,5 +102,6 @@ settings = Button(root, text='Settings', height=2, width=30, bg="#AEAEAE")
 title.pack(side=TOP, pady = 130)
 settings.pack(side=BOTTOM, pady=5)
 switch.pack(side=BOTTOM, pady=5)
+
 
 mainloop()
