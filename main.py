@@ -13,6 +13,10 @@ from mailer import *
 from speaker import *
 from PIL import ImageTk,Image
 import json
+from keras.models import model_from_json
+from scipy.constants import lb
+import google.protobuf
+from speech_sentiment_analysis import *
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -25,6 +29,7 @@ desired_rate = 150
 state = False
 time_count = [0, 0, 0]
 pattern = '{0:02d}:{1:02d}:{2:02d}'
+motion_inform = [False]
 
 # Must be included in settings:
 forbidden = []
@@ -52,6 +57,9 @@ sentiment_model_filename = "./sentiment_model.h5"
 gesture_model, gesture_graph, gesture_session = init_keras_thread(gesture_model_filename)
 sentiment_model, sentiment_graph, sentiment_session = init_keras_thread(sentiment_model_filename)
 
+####### WIP Speech To Emotion ######
+###################################
+
 def get_text_feedback(audio_filename):
     sr_thread = threading.Thread(target=check_speech_rate,args=(audio_filename,desired_rate, output_dic))
     sr_thread.start()
@@ -63,19 +71,34 @@ def get_gesture_feedback():
         gesture_model, gesture_graph, gesture_session, output_dic))
     gesture_thread.start()
 
+def get_motion_feedback():
+    motion_inform[0] = True
+    motion_thread = threading.Thread(target=capture_motion, args=(camera, motion_inform))
+    motion_thread.start()
+
 def get_sentiment_feedback():
     sentiment_thread = threading.Thread(target=analyze_sentiment,args=(capture_image(camera, bgModel, mode="sentiment"), \
         sentiment_model, sentiment_graph, sentiment_session, output_dic))
     sentiment_thread.start()
 
+def get_speech_emotion_feedback(audio_filename):
+    results = []
+    speech_emote = threading.Thread(target=speech_emotion_recognition, args=(audio_filename,results))
+    speech_emote.start()
+    while len(results) == 0:
+        pass
+    print(results)
+
 def record_thread():
     global counter
     runner2 = threading.currentThread()
+    get_motion_feedback()
     while getattr(runner2, "do_run", True):
         record_to_file(tmp_prefix_name + str(counter))
         get_text_feedback(f"{tmp_prefix_name}{counter}") if live_feedback_on else None
         # get_gesture_feedback() if camera.isOpened() else None
         # get_sentiment_feedback() if camera.isOpened() else None
+        # get_speech_emotion_feedback(tmp_prefix_name + str(counter)) doesn't work atm
         counter += 1
     switch.configure(text="Start", command=start_command, state=NORMAL, bg="#BBFAC7")
     runner2 = threading.Thread(target=stop_thread,args=())
@@ -85,7 +108,6 @@ def stop_thread():
     global counter
     global last_file_counter
     temp = counter
-    runner1 = threading.currentThread()
     for i in range(last_file_counter, counter):
         try:
             os.remove(dir_path + f"\\{tmp_prefix_name}" + str(i) + ".wav")
@@ -113,6 +135,7 @@ def stop_command():
     time_count = [0, 0, 0]
     timer.configure(text='00:00:00')
     runner1.do_run = False
+    motion_inform[0] = False
     switch.config(text="Processing", state="disabled")
     try:
         os.remove(dir_path + "\\data.csv")

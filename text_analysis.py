@@ -69,7 +69,10 @@ def check_speech_rate(audio_filename, desired_rate, output_dic):
 def check_filler_words(audio_filename, forbidden_words, output_dic):
     if not forbidden_words:
         forbidden_words = ["so", "um", "like", "literally", "basically", "well"]
-    words = get_words(audio_filename).split(" ")
+    try:
+        words = get_words(audio_filename).split(" ")
+    except:
+        return
     illegals = list(set(words).intersection(forbidden_words))
     if illegals:
         if len(illegals) > 1:

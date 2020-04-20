@@ -91,6 +91,49 @@ def capture_image(camera, bgModel, mode="gesture"):
         return cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
 
+def capture_motion(camera, motion_inform):
+    current = time.time()
+    sdThresh = 12
+    def distMap(frame1, frame2):
+        """outputs pythagorean distance between two frames"""
+        frame1_32 = np.float32(frame1)
+        frame2_32 = np.float32(frame2)
+        diff32 = frame1_32 - frame2_32
+        norm32 = np.sqrt(diff32[:, :, 0] ** 2 + diff32[:, :, 1] ** 2 + diff32[:, :, 2] ** 2) / np.sqrt(
+            255 ** 2 + 255 ** 2 + 255 ** 2)
+        dist = np.uint8(norm32 * 255)
+        return dist
+    _, frame1 = camera.read()
+    _, frame2 = camera.read()
+    while motion_inform[0]:
+        try:
+            _, frame3 = camera.read()
+            rows, cols, _ = np.shape(frame3)
+            dist = distMap(frame1, frame3)
+            frame1 = frame2
+            frame2 = frame3
+            # apply Gaussian smoothing
+            mod = cv2.GaussianBlur(dist, (9, 9), 0)
+            # apply thresholding
+            _, thresh = cv2.threshold(mod, 100, 255, 0)
+            # calculate st dev test
+            _, stDev = cv2.meanStdDev(mod)
+            if time.time() - current > 15:
+                print("please move")
+                current = time.time()
+                load_speech("You should gesture more.")
+                unload_speech()
+            if stDev > sdThresh:
+                print("Motion detected")
+                current = time.time()
+            if cv2.waitKey(1) & 0xFF == 27:
+                break
+        except:
+            break
+    camera.release()
+    cv2.destroyAllWindows()
+    print("Done")
+
 def analyze_gesture(thresh, model, graph, session, output_dic):
     # copies 1 channel BW image to all 3 RGB channels
     target = np.stack((thresh, ) * 3, axis=-1)
