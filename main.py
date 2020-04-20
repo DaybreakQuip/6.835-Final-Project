@@ -1,4 +1,5 @@
 from tkinter.scrolledtext import ScrolledText
+from tkinter.ttk import Combobox
 
 from record import record_to_file
 import os
@@ -84,7 +85,7 @@ def stop_thread():
     global counter
     global last_file_counter
     temp = counter
-    #runner1 = threading.currentThread()
+    runner1 = threading.currentThread()
     for i in range(last_file_counter, counter):
         try:
             os.remove(dir_path + f"\\{tmp_prefix_name}" + str(i) + ".wav")
@@ -134,7 +135,7 @@ def update_timer():
 def settings_win():
     settings_window = Toplevel(root)
     settings_window.title("Settings")
-    settings_window.geometry("200x300""+{}+{}".format(positionRight + 50, positionDown + 100))
+    settings_window.geometry("300x500""+{}+{}".format(positionRight + 50, positionDown + 100))
 
     words_label = Label(settings_window, text="Illegal Words Entry:", font=("Courier",10))
     e = ScrolledText(settings_window, width=30, height=10, wrap=WORD)
@@ -146,10 +147,41 @@ def settings_win():
         search_param = e.get("1.0","end-1c")
         forbidden.clear()
         forbidden.extend(search_param.split())
-        print(forbidden)
 
     list_of_words = Button(settings_window, text='Update', height=2, width=20, command=update_words)
     list_of_words.pack()
+
+
+    email_label = Label(settings_window, text="Send Report to Email?:", font=("Courier",10))
+    email_option = Combobox(settings_window, values=["Send Report", "Don't Send Report"])
+    email_label.pack()
+    email_option.pack()
+
+    address_label = Label(settings_window, text="Enter Email Addresses:", font=("Courier",10))
+    e_address = ScrolledText(settings_window, width=30, height=10, wrap=WORD)
+    e_address.insert(END, ' '.join(RECEIVER_EMAILS))
+
+    def update_address():
+        search_param = e_address.get("1.0","end-1c")
+        RECEIVER_EMAILS.clear()
+        RECEIVER_EMAILS.extend(search_param.split())
+
+    address_label.pack()
+    address_update = Button(settings_window, text='Update', height=2, width=20, command=update_address)
+    e_address.pack()
+    address_update.pack()
+
+    def email_option_selected(event):
+        global CAN_SEND_EMAIL
+        if email_option.get() == "Send Report":
+            CAN_SEND_EMAIL = True
+        else:
+            CAN_SEND_EMAIL = False
+
+    email_option.bind("<<ComboboxSelected>>", email_option_selected)
+
+
+
 
 
     settings_window.transient(root)
