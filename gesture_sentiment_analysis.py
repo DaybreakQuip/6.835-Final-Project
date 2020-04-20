@@ -5,6 +5,7 @@ from keras.models import load_model
 import pygame
 import tensorflow as tf
 import time
+from speaker import *
 
 prediction = ''
 action = ''
@@ -90,7 +91,7 @@ def capture_image(camera, bgModel, mode="gesture"):
         return cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
 
-def analyze_gesture(thresh, model, graph, session):
+def analyze_gesture(thresh, model, graph, session, output_dic):
     # copies 1 channel BW image to all 3 RGB channels
     target = np.stack((thresh, ) * 3, axis=-1)
     target = cv2.resize(target, (224, 224))
@@ -99,35 +100,29 @@ def analyze_gesture(thresh, model, graph, session):
         with session.as_default():
             prediction, score = predict_rgb_image_vgg(model, target)
             prediction = gesture_names[prediction]
-            if prediction == 'Palm':
-                print("Palm")
-            elif prediction == 'Fist':
+            if prediction == 'Fist':
                 print('Fist')
-            elif prediction == 'L':
-                print("L")
             elif prediction == 'Okay':
                 print("Okay")
-            elif prediction == 'Peace':
-                print("Prace")
             else:
-                print("nothi")
+                pass
 
 
-def analyze_sentiment(target, model, graph, session):
+def analyze_sentiment(target, model, graph, session, output_dic):
     target = cv2.resize(target, (48, 48))
     target = target.reshape(-1, 48, 48, 1)
     with graph.as_default():
         with session.as_default():
             prediction, score = predict_rgb_image_vgg(model, target)
             if prediction == 0:
-                print("angry")
+                output_dic["MOOD"]["angry"] += 1
             elif prediction == 1:
-                print("disgust")
+                output_dic["MOOD"]["disgust"] += 1
             elif prediction == 3:
-                print("sad")
+                output_dic["MOOD"]["sad"] += 1
             elif prediction == 4:
-                print("sad")
+                output_dic["MOOD"]["sad"] += 1
             elif prediction == 5:
-                print("surprise")
+                output_dic["MOOD"]["surprise"] += 1
             else:
-                print("neutral")
+                output_dic["MOOD"]["neutral"] += 1

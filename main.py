@@ -10,8 +10,8 @@ from text_analysis import *
 from gesture_sentiment_analysis import *
 from mailer import *
 from speaker import *
-from utils import *
 from PIL import ImageTk,Image
+import json
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -24,7 +24,22 @@ desired_rate = 150
 state = False
 time_count = [0, 0, 0]
 pattern = '{0:02d}:{1:02d}:{2:02d}'
+
+# Must be included in settings:
 forbidden = []
+CAN_SEND_EMAIL = False
+RECEIVER_EMAILS = [""]
+#########################################
+
+
+output_dic = {"AVG_SPEECH_RATE": 130., "SAID_ILLEGALS": [], "MOOD": {
+    "angry": 0,
+    "disgust": 0,
+    "fear": 0,
+    "sad": 0,
+    "surprise": 0,
+    "neutral": 0,
+}}
 
 bgModel = cv2.createBackgroundSubtractorMOG2(0, bgSubThreshold)
 time.sleep(2)
@@ -36,18 +51,20 @@ sentiment_model_filename = "./sentiment_model.h5"
 gesture_model, gesture_graph, gesture_session = init_keras_thread(gesture_model_filename)
 sentiment_model, sentiment_graph, sentiment_session = init_keras_thread(sentiment_model_filename)
 
-def get_live_feedback(filename, criteria={}):
-    feedback_thread = threading.Thread(target=check_speech_rate,args=(filename,desired_rate))
-    feedback_thread.start()
+def get_text_feedback(audio_filename):
+    sr_thread = threading.Thread(target=check_speech_rate,args=(audio_filename,desired_rate, output_dic))
+    sr_thread.start()
+    filler_thread = threading.Thread(target=check_filler_words,args=(audio_filename,forbidden, output_dic))
+    filler_thread.start()
 
 def get_gesture_feedback():
     gesture_thread = threading.Thread(target=analyze_gesture,args=(capture_image(camera, bgModel), \
-        gesture_model, gesture_graph, gesture_session))
+        gesture_model, gesture_graph, gesture_session, output_dic))
     gesture_thread.start()
 
 def get_sentiment_feedback():
     sentiment_thread = threading.Thread(target=analyze_sentiment,args=(capture_image(camera, bgModel, mode="sentiment"), \
-        sentiment_model, sentiment_graph, sentiment_session))
+        sentiment_model, sentiment_graph, sentiment_session, output_dic))
     sentiment_thread.start()
 
 def record_thread():
@@ -55,7 +72,7 @@ def record_thread():
     runner2 = threading.currentThread()
     while getattr(runner2, "do_run", True):
         record_to_file(tmp_prefix_name + str(counter))
-        get_live_feedback(f"{tmp_prefix_name}{counter}") if live_feedback_on else None
+        get_text_feedback(f"{tmp_prefix_name}{counter}") if live_feedback_on else None
         # get_gesture_feedback() if camera.isOpened() else None
         # get_sentiment_feedback() if camera.isOpened() else None
         counter += 1
@@ -139,7 +156,6 @@ def settings_win():
     settings_window.grab_set()
     root.wait_window(settings_window)
 
-
 root = Tk()
 windowWidth = root.winfo_reqwidth()
 windowHeight = root.winfo_reqheight()
@@ -150,7 +166,7 @@ root.geometry("300x600""+{}+{}".format(positionRight, positionDown))
 title = Label(root, text="6.UAssist")
 timer = Label(root, text="00:00:00", font=("Courier", 35))
 
-image=ImageTk.PhotoImage(Image.open("best.png"))
+image=ImageTk.PhotoImage(Image.open("abstract-image.jpg"))
 background_label = Label(root, image=image, height=120, width=120)
 
 
@@ -167,3 +183,6 @@ switch.pack(side=BOTTOM, pady=5)
 
 update_timer()
 mainloop()
+
+if CAN_SEND_EMAIL:
+    send_message(compose_message(output_dic), RECEIVER_EMAILS)
