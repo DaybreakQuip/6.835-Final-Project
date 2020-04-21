@@ -6,6 +6,7 @@ import os
 import time
 import threading
 from tkinter import *
+from winsound import *
 
 from text_analysis import *
 from gesture_sentiment_analysis import *
@@ -204,12 +205,10 @@ def settings_win():
     email_option.bind("<<ComboboxSelected>>", email_option_selected)
 
 
-
-
-
     settings_window.transient(root)
     settings_window.grab_set()
     root.wait_window(settings_window)
+
 
 root = Tk()
 windowWidth = root.winfo_reqwidth()
@@ -220,11 +219,13 @@ positionDown = int(root.winfo_screenheight()/4 - windowHeight/4) - 50
 root.geometry("300x600""+{}+{}".format(positionRight, positionDown))
 title = Label(root, text="6.UAssist")
 timer = Label(root, text="00:00:00", font=("Courier", 35))
-
+def fun_stuff_delete_later(event):
+    play = lambda: PlaySound('ui_sample.wav', SND_FILENAME)
+    a = threading.Thread(target=play)
+    a.start()
 image=ImageTk.PhotoImage(Image.open("abstract-image.jpg"))
 background_label = Label(root, image=image, height=120, width=120)
-
-
+background_label.bind("<Button>", fun_stuff_delete_later)
 
 title.config(font=("Courier", 35))
 switch = Button(root, text='Start', height=2, width= 20, command=start_command, bg="#BBFAC7")
