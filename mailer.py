@@ -23,6 +23,9 @@ def compose_message(output_dic):
             6-UAssist\n", "Subject: Here is your performance summary.\n"] + msgs
     return "".join(lines)
 
+def compose_summary(logs):
+    print("compose_summary invoked")
+
 def send_message(message, RECEIVER_EMAILS, SENDER_EMAIL_PASSWORD=SENDER_EMAIL_PASSWORD):
     context = ssl.create_default_context()
     with smtplib.SMTP_SSL(SMTP_SERVER, PORT, context=context) as server:

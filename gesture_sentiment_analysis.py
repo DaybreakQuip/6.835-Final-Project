@@ -91,7 +91,7 @@ def capture_image(camera, bgModel, mode="gesture"):
         return cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
 
-def capture_motion(camera, motion_inform):
+def capture_motion(camera, motion_inform, live_feedback_on):
     current = time.time()
     sdThresh = 12
     def distMap(frame1, frame2):
@@ -118,7 +118,7 @@ def capture_motion(camera, motion_inform):
             _, thresh = cv2.threshold(mod, 100, 255, 0)
             # calculate st dev test
             _, stDev = cv2.meanStdDev(mod)
-            if time.time() - current > 15:
+            if time.time() - current > 15 and live_feedback_on:
                 print("please move")
                 current = time.time()
                 load_speech("You should gesture more.")
@@ -134,7 +134,7 @@ def capture_motion(camera, motion_inform):
     cv2.destroyAllWindows()
     print("Done")
 
-def analyze_gesture(thresh, model, graph, session, output_dic):
+def analyze_gesture(thresh, model, graph, session, output_dic, live_feedback_on):
     # copies 1 channel BW image to all 3 RGB channels
     target = np.stack((thresh, ) * 3, axis=-1)
     target = cv2.resize(target, (224, 224))
@@ -151,7 +151,7 @@ def analyze_gesture(thresh, model, graph, session, output_dic):
                 pass
 
 
-def analyze_sentiment(target, model, graph, session, output_dic):
+def analyze_sentiment(target, model, graph, session, output_dic, live_feedback_on):
     target = cv2.resize(target, (48, 48))
     target = target.reshape(-1, 48, 48, 1)
     with graph.as_default():

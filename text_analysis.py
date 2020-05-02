@@ -59,26 +59,27 @@ def get_words(filename="recording_"):
 
     return
 
-def check_speech_rate(audio_filename, desired_rate, output_dic):
+def check_speech_rate(audio_filename, desired_rate, output_dic, live_feedback_on):
     sr = convert_to_words_per_min(get_speech_rate(audio_filename))
     output_dic["AVG_SPEECH_RATE"] = (output_dic["AVG_SPEECH_RATE"] + sr) / 2.
-    if sr > desired_rate:
+    if sr > desired_rate and live_feedback_on:
         load_speech("You are speaking too fast. Speak slower.")
         unload_speech()
 
-def check_filler_words(audio_filename, forbidden_words, output_dic):
-    if not forbidden_words:
-        forbidden_words = ["so", "um", "like", "literally", "basically", "well"]
+def check_filler_words(audio_filename, forbidden_words, output_dic, live_feedback_on):
+    default_forbiddens = ["so", "um", "like", "literally", "basically", "well"]
+    forbidden_words = default_forbiddens if not forbidden_words else forbidden_words + default_forbiddens
     try:
         words = get_words(audio_filename).split(" ")
     except:
         return
     illegals = list(set(words).intersection(forbidden_words))
     if illegals:
-        if len(illegals) > 1:
-            load_speech(f"Careful, you said the word {', '.join(illegals[:-1])} and {illegals[-1]}.")
-        else:
-            load_speech(f"Careful, you said the word {illegals[-1]}.")
-        unload_speech()
+        if live_feedback_on:
+            if len(illegals) > 1:
+                load_speech(f"Careful, you said the word {', '.join(illegals[:-1])} and {illegals[-1]}.")
+            else:
+                load_speech(f"Careful, you said the word {illegals[-1]}.")
+            unload_speech()
         output_dic["SAID_ILLEGALS"] = list(set(output_dic["SAID_ILLEGALS"].append(illegals)))
 

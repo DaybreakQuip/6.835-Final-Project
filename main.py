@@ -5,6 +5,8 @@ from record import record_to_file
 import os
 import time
 import threading
+import wave
+from datetime import datetime
 from tkinter import *
 from winsound import *
 
@@ -24,9 +26,7 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 runner1 = None
 counter = 0
 last_file_counter = 0
-live_feedback_on = True
 tmp_prefix_name = "recording_"
-desired_rate = 150
 state = False
 time_count = [0, 0, 0]
 pattern = '{0:02d}:{1:02d}:{2:02d}'
@@ -35,9 +35,14 @@ motion_inform = [False]
 # Must be included in settings:
 forbidden = []
 CAN_SEND_EMAIL = False
+GET_SUMMARY = False
 RECEIVER_EMAILS = [""]
+live_feedback_on = True
+username = "daboki"
+desired_rate_mode = "slow"
 #########################################
 
+desired_rate = 180 if desired_rate_mode == "fast" else 150 # we will have two categories: slow or fast. slow -> 150, fast -> 180
 
 output_dic = {"AVG_SPEECH_RATE": 130., "SAID_ILLEGALS": [], "MOOD": {
     "angry": 0,
@@ -60,31 +65,44 @@ sentiment_model, sentiment_graph, sentiment_session = init_keras_thread(sentimen
 
 ####### WIP Speech To Emotion ######
 ###################################
+def update_log(today_string):
+    try:
+        with open(username + ".json", "r+") as f:
+            logs = json.load(f)
+            f.seek(0)
+            f.truncate()
+            logs[today_string] = output_dic
+            json.dump(logs, f)
+    except:
+        with open(username + ".json", "w+") as f:
+            logs = {}
+            logs[today_string] = output_dic
+            json.dump(logs, f)
 
 def get_text_feedback(audio_filename):
-    sr_thread = threading.Thread(target=check_speech_rate,args=(audio_filename,desired_rate, output_dic))
+    sr_thread = threading.Thread(target=check_speech_rate,args=(audio_filename,desired_rate, output_dic, live_feedback_on))
     sr_thread.start()
-    filler_thread = threading.Thread(target=check_filler_words,args=(audio_filename,forbidden, output_dic))
+    filler_thread = threading.Thread(target=check_filler_words,args=(audio_filename,forbidden, output_dic, live_feedback_on))
     filler_thread.start()
 
 def get_gesture_feedback():
     gesture_thread = threading.Thread(target=analyze_gesture,args=(capture_image(camera, bgModel), \
-        gesture_model, gesture_graph, gesture_session, output_dic))
+        gesture_model, gesture_graph, gesture_session, output_dic, live_feedback_on))
     gesture_thread.start()
 
 def get_motion_feedback():
     motion_inform[0] = True
-    motion_thread = threading.Thread(target=capture_motion, args=(camera, motion_inform))
+    motion_thread = threading.Thread(target=capture_motion, args=(camera, motion_inform, live_feedback_on))
     motion_thread.start()
 
 def get_sentiment_feedback():
     sentiment_thread = threading.Thread(target=analyze_sentiment,args=(capture_image(camera, bgModel, mode="sentiment"), \
-        sentiment_model, sentiment_graph, sentiment_session, output_dic))
+        sentiment_model, sentiment_graph, sentiment_session, output_dic, live_feedback_on))
     sentiment_thread.start()
 
 def get_speech_emotion_feedback(audio_filename):
     results = []
-    speech_emote = threading.Thread(target=speech_emotion_recognition, args=(audio_filename,results))
+    speech_emote = threading.Thread(target=speech_emotion_recognition, args=(audio_filename,results, live_feedback_on))
     speech_emote.start()
     while len(results) == 0:
         pass
@@ -97,9 +115,9 @@ def record_thread():
     while getattr(runner2, "do_run", True):
         record_to_file(tmp_prefix_name + str(counter))
         get_text_feedback(f"{tmp_prefix_name}{counter}") if live_feedback_on else None
-        # get_gesture_feedback() if camera.isOpened() else None
-        # get_sentiment_feedback() if camera.isOpened() else None
-        # get_speech_emotion_feedback(tmp_prefix_name + str(counter)) doesn't work atm
+        # get_gesture_feedback() if camera.isOpened() and live_feedback_on else None
+        # get_sentiment_feedback() if camera.isOpened() and live_feedback_on else None
+        # get_speech_emotion_feedback(tmp_prefix_name + str(counter)) if camera.isOpened() and live_feedback_on else None
         counter += 1
     switch.configure(text="Start", command=start_command, state=NORMAL, bg="#BBFAC7")
     runner2 = threading.Thread(target=stop_thread,args=())
@@ -108,17 +126,48 @@ def record_thread():
 def stop_thread():
     global counter
     global last_file_counter
+    time.sleep(6)
     temp = counter
+
+    # combine all tmp sound files into summary.wav file and delete tmp files
+    outfile = "summary.wav"
+    set_params = False
+    output = wave.open(outfile, 'wb')
     for i in range(last_file_counter, counter):
+        infile = f"{tmp_prefix_name}" + str(i) + ".wav"
+        textgrid_file = f"{tmp_prefix_name}" + str(i) + ".TextGrid"
+        w = wave.open(infile, 'rb')
+        if not set_params:
+            output.setparams(w.getparams())
+            set_params = True
+        output.writeframes(w.readframes(w.getnframes()))
+        w.close()
         try:
-            os.remove(dir_path + f"\\{tmp_prefix_name}" + str(i) + ".wav")
-            os.remove(dir_path + f"\\{tmp_prefix_name}" + str(i) + ".TextGrid")
-        except:
+            os.remove(dir_path + "\\" + infile)
+            os.remove(dir_path + "\\" + textgrid_file)
+        except Exception as e:
+            print(e)
             print("Unable to find/delete certain tmp files")
+            continue
+
+    output.close()
+
+    ##############
+
+    get_text_feedback("summary.wav") if not live_feedback_on else None
+
+    today_string = str(datetime.now())
+    update_log(today_string) if username != "" else None
+
     last_file_counter = temp
-    
+
     if CAN_SEND_EMAIL:
-        send_message(compose_message())
+        send_message(compose_message(output_dic), RECEIVER_EMAILS)
+
+    if GET_SUMMARY and username != "":
+        with open(username + ".json", "r") as f:
+            logs = json.load(f)
+            compose_summary(logs)
 
 def start_command():
     global runner1
@@ -239,6 +288,3 @@ switch.pack(side=BOTTOM, pady=5)
 
 update_timer()
 mainloop()
-
-if CAN_SEND_EMAIL:
-    send_message(compose_message(output_dic), RECEIVER_EMAILS)
