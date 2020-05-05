@@ -20,6 +20,7 @@ from keras.models import model_from_json
 from scipy.constants import lb
 import google.protobuf
 from speech_sentiment_analysis import *
+from settings_ui import settings_win, setting_params
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -32,17 +33,9 @@ time_count = [0, 0, 0]
 pattern = '{0:02d}:{1:02d}:{2:02d}'
 motion_inform = [False]
 
-# Must be included in settings:
-forbidden = []
-CAN_SEND_EMAIL = False
-GET_SUMMARY = False
-RECEIVER_EMAILS = [""]
-live_feedback_on = True
-username = "daboki"
-desired_rate_mode = "slow"
 #########################################
 
-desired_rate = 180 if desired_rate_mode == "fast" else 150 # we will have two categories: slow or fast. slow -> 150, fast -> 180
+desired_rate = 180 if setting_params["desired_rate_mode"] == "fast" else 150 # we will have two categories: slow or fast. slow -> 150, fast -> 180
 
 output_dic = {"AVG_SPEECH_RATE": 130., "SAID_ILLEGALS": [], "MOOD": {
     "angry": 0,
@@ -67,42 +60,42 @@ sentiment_model, sentiment_graph, sentiment_session = init_keras_thread(sentimen
 ###################################
 def update_log(today_string):
     try:
-        with open(username + ".json", "r+") as f:
+        with open(setting_params["username"] + ".json", "r+") as f:
             logs = json.load(f)
             f.seek(0)
             f.truncate()
             logs[today_string] = output_dic
             json.dump(logs, f)
     except:
-        with open(username + ".json", "w+") as f:
+        with open(setting_params["username"] + ".json", "w+") as f:
             logs = {}
             logs[today_string] = output_dic
             json.dump(logs, f)
 
 def get_text_feedback(audio_filename):
-    sr_thread = threading.Thread(target=check_speech_rate,args=(audio_filename,desired_rate, output_dic, live_feedback_on))
+    sr_thread = threading.Thread(target=check_speech_rate,args=(audio_filename,desired_rate, output_dic, setting_params["live_feedback_on"], setting_params["voice_on"], root))
     sr_thread.start()
-    filler_thread = threading.Thread(target=check_filler_words,args=(audio_filename,forbidden, output_dic, live_feedback_on))
+    filler_thread = threading.Thread(target=check_filler_words,args=(audio_filename,setting_params["forbidden"], output_dic, setting_params["live_feedback_on"],setting_params["voice_on"], root))
     filler_thread.start()
 
 def get_gesture_feedback():
     gesture_thread = threading.Thread(target=analyze_gesture,args=(capture_image(camera, bgModel), \
-        gesture_model, gesture_graph, gesture_session, output_dic, live_feedback_on))
+        gesture_model, gesture_graph, gesture_session, output_dic, setting_params["live_feedback_on"]))
     gesture_thread.start()
 
 def get_motion_feedback():
     motion_inform[0] = True
-    motion_thread = threading.Thread(target=capture_motion, args=(camera, motion_inform, live_feedback_on))
+    motion_thread = threading.Thread(target=capture_motion, args=(camera, motion_inform, setting_params["live_feedback_on"], setting_params["voice_on"], root))
     motion_thread.start()
 
 def get_sentiment_feedback():
     sentiment_thread = threading.Thread(target=analyze_sentiment,args=(capture_image(camera, bgModel, mode="sentiment"), \
-        sentiment_model, sentiment_graph, sentiment_session, output_dic, live_feedback_on))
+        sentiment_model, sentiment_graph, sentiment_session, output_dic, setting_params["live_feedback_on"]))
     sentiment_thread.start()
 
 def get_speech_emotion_feedback(audio_filename):
     results = []
-    speech_emote = threading.Thread(target=speech_emotion_recognition, args=(audio_filename,results, live_feedback_on))
+    speech_emote = threading.Thread(target=speech_emotion_recognition, args=(audio_filename,results, setting_params["live_feedback_on"]))
     speech_emote.start()
     while len(results) == 0:
         pass
@@ -114,10 +107,10 @@ def record_thread():
     get_motion_feedback()
     while getattr(runner2, "do_run", True):
         record_to_file(tmp_prefix_name + str(counter))
-        get_text_feedback(f"{tmp_prefix_name}{counter}") if live_feedback_on else None
-        # get_gesture_feedback() if camera.isOpened() and live_feedback_on else None
-        # get_sentiment_feedback() if camera.isOpened() and live_feedback_on else None
-        # get_speech_emotion_feedback(tmp_prefix_name + str(counter)) if camera.isOpened() and live_feedback_on else None
+        get_text_feedback(f"{tmp_prefix_name}{counter}") if setting_params["live_feedback_on"] else None
+        # get_gesture_feedback() if camera.isOpened() and setting_params["live_feedback_on else None
+        # get_sentiment_feedback() if camera.isOpened() and setting_params["live_feedback_on else None
+        # get_speech_emotion_feedback(tmp_prefix_name + str(counter)) if camera.isOpened() and setting_params["live_feedback_on else None
         counter += 1
     switch.configure(text="Start", command=start_command, state=NORMAL, bg="#BBFAC7")
     runner2 = threading.Thread(target=stop_thread,args=())
@@ -154,18 +147,18 @@ def stop_thread():
 
     ##############
 
-    get_text_feedback("summary.wav") if not live_feedback_on else None
+    get_text_feedback("summary.wav") if not setting_params["live_feedback_on"] else None
 
     today_string = str(datetime.now())
-    update_log(today_string) if username != "" else None
+    update_log(today_string) if setting_params["username"] != "" else None
 
     last_file_counter = temp
 
-    if CAN_SEND_EMAIL:
-        send_message(compose_message(output_dic), RECEIVER_EMAILS)
+    if setting_params["CAN_SEND_EMAIL"]:
+        send_message(compose_message(output_dic), setting_params["RECEIVER_EMAILS"])
 
-    if GET_SUMMARY and username != "":
-        with open(username + ".json", "r") as f:
+    if setting_params["GET_SUMMARY"] and setting_params["username"] != "":
+        with open(setting_params["username"] + ".json", "r") as f:
             logs = json.load(f)
             compose_summary(logs)
 
@@ -205,60 +198,6 @@ def update_timer():
         timer.config(text=pattern.format(time_count[0],time_count[1],time_count[2]))
     root.after(10, update_timer)
 
-def settings_win():
-    settings_window = Toplevel(root)
-    settings_window.title("Settings")
-    settings_window.geometry("300x500""+{}+{}".format(positionRight + 50, positionDown + 100))
-
-    words_label = Label(settings_window, text="Illegal Words Entry:", font=("Courier",10))
-    e = ScrolledText(settings_window, width=30, height=10, wrap=WORD)
-    e.insert(END, ' '.join(forbidden))
-    words_label.pack()
-    e.pack()
-
-    def update_words():
-        search_param = e.get("1.0","end-1c")
-        forbidden.clear()
-        forbidden.extend(search_param.split())
-
-    list_of_words = Button(settings_window, text='Update', height=2, width=20, command=update_words)
-    list_of_words.pack()
-
-
-    email_label = Label(settings_window, text="Send Report to Email?:", font=("Courier",10))
-    email_option = Combobox(settings_window, values=["Send Report", "Don't Send Report"])
-    email_label.pack()
-    email_option.pack()
-
-    address_label = Label(settings_window, text="Enter Email Addresses:", font=("Courier",10))
-    e_address = ScrolledText(settings_window, width=30, height=10, wrap=WORD)
-    e_address.insert(END, ' '.join(RECEIVER_EMAILS))
-
-    def update_address():
-        search_param = e_address.get("1.0","end-1c")
-        RECEIVER_EMAILS.clear()
-        RECEIVER_EMAILS.extend(search_param.split())
-
-    address_label.pack()
-    address_update = Button(settings_window, text='Update', height=2, width=20, command=update_address)
-    e_address.pack()
-    address_update.pack()
-
-    def email_option_selected(event):
-        global CAN_SEND_EMAIL
-        if email_option.get() == "Send Report":
-            CAN_SEND_EMAIL = True
-        else:
-            CAN_SEND_EMAIL = False
-
-    email_option.bind("<<ComboboxSelected>>", email_option_selected)
-
-
-    settings_window.transient(root)
-    settings_window.grab_set()
-    root.wait_window(settings_window)
-
-
 root = Tk()
 windowWidth = root.winfo_reqwidth()
 windowHeight = root.winfo_reqheight()
@@ -277,8 +216,8 @@ background_label = Label(root, image=image, height=120, width=120)
 background_label.bind("<Button>", fun_stuff_delete_later)
 
 title.config(font=("Courier", 35))
-switch = Button(root, text='Start', height=2, width= 20, command=start_command, bg="#BBFAC7")
-settings = Button(root, text='Settings', height=2, width=30, bg="#AEAEAE",command=settings_win)
+switch = Button(root, text='Start', height=2, width= 20, command=start_command, bg="#BBFAC7",font=("Courier", 10))
+settings = Button(root, text='Settings', height=2, width=30, bg="#AEAEAE",command= lambda: settings_win(root, positionRight, positionDown),font=("Courier", 10))
 
 background_label.pack()
 title.pack(side=TOP, pady = 100)

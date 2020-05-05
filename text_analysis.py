@@ -2,6 +2,7 @@ import myspsolution as mysp
 import speech_recognition as sr
 from speaker import *
 import os
+import time
 
 AVERAGE_SYLLABLES_PER_WORD = 1
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -59,15 +60,23 @@ def get_words(filename="recording_"):
 
     return
 
-def check_speech_rate(audio_filename, desired_rate, output_dic, live_feedback_on):
+def check_speech_rate(audio_filename, desired_rate, output_dic, live_feedback_on, voice_on, root):
+    current = time.time()
     sr = convert_to_words_per_min(get_speech_rate(audio_filename))
     output_dic["AVG_SPEECH_RATE"] = (output_dic["AVG_SPEECH_RATE"] + sr) / 2.
     if sr > desired_rate and live_feedback_on:
-        load_speech("You are speaking too fast. Speak slower.")
-        unload_speech()
+        root.config(bg="red")
+        current = time.time()
+        if voice_on:
+            load_speech("You are speaking too fast. Speak slower.")
+            unload_speech()
+    while time.time() - current < 3:
+        pass
+    root.config(bg="#F0F0F0")
 
-def check_filler_words(audio_filename, forbidden_words, output_dic, live_feedback_on):
+def check_filler_words(audio_filename, forbidden_words, output_dic, live_feedback_on, voice_on, root):
     default_forbiddens = ["so", "um", "like", "literally", "basically", "well"]
+    current = time.time()
     forbidden_words = default_forbiddens if not forbidden_words else forbidden_words + default_forbiddens
     try:
         words = get_words(audio_filename).split(" ")
@@ -76,10 +85,16 @@ def check_filler_words(audio_filename, forbidden_words, output_dic, live_feedbac
     illegals = list(set(words).intersection(forbidden_words))
     if illegals:
         if live_feedback_on:
-            if len(illegals) > 1:
-                load_speech(f"Careful, you said the word {', '.join(illegals[:-1])} and {illegals[-1]}.")
-            else:
-                load_speech(f"Careful, you said the word {illegals[-1]}.")
-            unload_speech()
-        output_dic["SAID_ILLEGALS"] = list(set(output_dic["SAID_ILLEGALS"].append(illegals)))
+            root.config(bg="khaki")
+            if voice_on:
+                if len(illegals) > 1:
+                    load_speech(f"Careful, you said the word {', '.join(illegals[:-1])} and {illegals[-1]}.")
+                else:
+                    load_speech(f"Careful, you said the word {illegals[-1]}.")
+                unload_speech()
+            output_dic["SAID_ILLEGALS"] = list(set(output_dic["SAID_ILLEGALS"].append(illegals)))
+    while time.time() - current < 3:
+        pass
+    root.config(bg="#F0F0F0")
+
 

@@ -6,7 +6,7 @@ import pygame
 import tensorflow as tf
 import time
 from speaker import *
-
+from settings_ui import setting_params
 prediction = ''
 action = ''
 score = 0
@@ -91,7 +91,8 @@ def capture_image(camera, bgModel, mode="gesture"):
         return cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
 
-def capture_motion(camera, motion_inform, live_feedback_on):
+def capture_motion(camera, motion_inform, live_feedback_on, voice_on, root):
+    print("This is going")
     current = time.time()
     sdThresh = 12
     def distMap(frame1, frame2):
@@ -120,11 +121,14 @@ def capture_motion(camera, motion_inform, live_feedback_on):
             _, stDev = cv2.meanStdDev(mod)
             if time.time() - current > 15 and live_feedback_on:
                 print("please move")
+                root.config(bg="dark orange")
                 current = time.time()
-                load_speech("You should gesture more.")
-                unload_speech()
+                if voice_on:
+                    load_speech("You should gesture more.")
+                    unload_speech()
             if stDev > sdThresh:
                 print("Motion detected")
+                root.config(bg="#F0F0F0")
                 current = time.time()
             if cv2.waitKey(1) & 0xFF == 27:
                 break
