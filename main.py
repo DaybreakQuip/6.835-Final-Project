@@ -4,6 +4,7 @@ from tkinter.ttk import Combobox
 from record import record_to_file
 import os
 import time
+import sys
 import threading
 import wave
 from datetime import datetime
@@ -24,7 +25,7 @@ from settings_ui import settings_win, setting_params
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
-runner1 = None
+recorder_thread = None
 counter = 0
 last_file_counter = 0
 tmp_prefix_name = "recording_"
@@ -32,6 +33,7 @@ state = False
 time_count = [0, 0, 0]
 pattern = '{0:02d}:{1:02d}:{2:02d}'
 motion_inform = [False]
+UI_open = True
 
 #########################################
 
@@ -72,6 +74,11 @@ def update_log(today_string):
             logs[today_string] = output_dic
             json.dump(logs, f)
 
+def stop_word_check(audio_filename):
+    spoken_words = get_words(audio_filename)
+    if spoken_words and len(spoken_words) > 0 and setting_params["stop_phrase"] in spoken_words:
+        stop_command()
+
 def get_text_feedback(audio_filename):
     sr_thread = threading.Thread(target=check_speech_rate,args=(audio_filename,desired_rate, output_dic, setting_params["live_feedback_on"], setting_params["voice_on"], root))
     sr_thread.start()
@@ -88,6 +95,7 @@ def get_motion_feedback():
     motion_thread = threading.Thread(target=capture_motion, args=(camera, motion_inform, setting_params["live_feedback_on"], setting_params["voice_on"], root))
     motion_thread.start()
 
+
 def get_sentiment_feedback():
     sentiment_thread = threading.Thread(target=analyze_sentiment,args=(capture_image(camera, bgModel, mode="sentiment"), \
         sentiment_model, sentiment_graph, sentiment_session, output_dic, setting_params["live_feedback_on"]))
@@ -103,18 +111,23 @@ def get_speech_emotion_feedback(audio_filename):
 
 def record_thread():
     global counter
-    runner2 = threading.currentThread()
+    global recorder_thread
+    current_recorder_thread = threading.currentThread()
     get_motion_feedback()
-    while getattr(runner2, "do_run", True):
+    while getattr(current_recorder_thread, "do_run", True):
         record_to_file(tmp_prefix_name + str(counter))
         get_text_feedback(f"{tmp_prefix_name}{counter}") if setting_params["live_feedback_on"] else None
+        threading.Thread(target=stop_word_check, args=(f"{tmp_prefix_name}{counter}",)).start()
         # get_gesture_feedback() if camera.isOpened() and setting_params["live_feedback_on else None
         # get_sentiment_feedback() if camera.isOpened() and setting_params["live_feedback_on else None
         # get_speech_emotion_feedback(tmp_prefix_name + str(counter)) if camera.isOpened() and setting_params["live_feedback_on else None
         counter += 1
     switch.configure(text="Start", command=start_command, state=NORMAL, bg="#BBFAC7")
-    runner2 = threading.Thread(target=stop_thread,args=())
-    runner2.start()
+    settings.configure(state=NORMAL)
+    recorder_thread = None
+    threading.Thread(target=gesture_start_thread).start()
+    exit_handler_thread = threading.Thread(target=stop_thread,args=())
+    exit_handler_thread.start()
 
 def stop_thread():
     global counter
@@ -163,21 +176,22 @@ def stop_thread():
             compose_summary(logs)
 
 def start_command():
-    global runner1
+    global recorder_thread
     global state
     state = True
-    runner1 = threading.Thread(target=record_thread,args=())
-    runner1.start()
+    recorder_thread = threading.Thread(target=record_thread,args=())
+    recorder_thread.start()
     switch.configure(text="Stop", command=stop_command,bg="#FF7B5D")
+    settings.configure(state="disabled")
 
 def stop_command():
-    global runner1
+    global recorder_thread
     global state
     global time_count
     state = False
     time_count = [0, 0, 0]
     timer.configure(text='00:00:00')
-    runner1.do_run = False
+    recorder_thread.do_run = False
     motion_inform[0] = False
     switch.config(text="Processing", state="disabled")
     try:
@@ -198,6 +212,27 @@ def update_timer():
         timer.config(text=pattern.format(time_count[0],time_count[1],time_count[2]))
     root.after(10, update_timer)
 
+def gesture_start_thread():
+    current = time.time()
+    global recorder_thread
+    affirmation = []
+    while UI_open and recorder_thread is None:
+        affirmation.append(capture_motion_2(camera))
+        if time.time() - current > 5:
+            affirmation.clear()
+            current = time.time()
+        if affirmation.count(True) > 4:
+            start_command()
+            return
+
+def settings_click():
+    global UI_open
+    UI_open = False
+    settings_win(root, positionRight, positionDown)
+    UI_open = True
+    threading.Thread(target=gesture_start_thread).start()
+
+
 root = Tk()
 windowWidth = root.winfo_reqwidth()
 windowHeight = root.winfo_reqheight()
@@ -207,17 +242,26 @@ positionDown = int(root.winfo_screenheight()/4 - windowHeight/4) - 50
 root.geometry("300x600""+{}+{}".format(positionRight, positionDown))
 title = Label(root, text="6.UAssist")
 timer = Label(root, text="00:00:00", font=("Courier", 35))
+
 def fun_stuff_delete_later(event):
     play = lambda: PlaySound('ui_sample.wav', SND_FILENAME)
     a = threading.Thread(target=play)
     a.start()
+
 image=ImageTk.PhotoImage(Image.open("abstract-image.jpg"))
 background_label = Label(root, image=image, height=120, width=120)
 background_label.bind("<Button>", fun_stuff_delete_later)
 
 title.config(font=("Courier", 35))
 switch = Button(root, text='Start', height=2, width= 20, command=start_command, bg="#BBFAC7",font=("Courier", 10))
-settings = Button(root, text='Settings', height=2, width=30, bg="#AEAEAE",command= lambda: settings_win(root, positionRight, positionDown),font=("Courier", 10))
+settings = Button(root, text='Settings', height=2, width=30, bg="#AEAEAE",command=settings_click,font=("Courier", 10))
+def on_closing():
+    global UI_open
+    root.destroy()
+    UI_open = False
+    exit()
+
+root.protocol("WM_DELETE_WINDOW", on_closing)
 
 background_label.pack()
 title.pack(side=TOP, pady = 100)
@@ -226,4 +270,6 @@ settings.pack(side=BOTTOM, pady=5)
 switch.pack(side=BOTTOM, pady=5)
 
 update_timer()
+threading.Thread(target=gesture_start_thread).start()
 mainloop()
+

@@ -94,7 +94,7 @@ def capture_image(camera, bgModel, mode="gesture"):
 def capture_motion(camera, motion_inform, live_feedback_on, voice_on, root):
     print("This is going")
     current = time.time()
-    sdThresh = 12
+    sdThresh = 10
     def distMap(frame1, frame2):
         """outputs pythagorean distance between two frames"""
         frame1_32 = np.float32(frame1)
@@ -119,9 +119,10 @@ def capture_motion(camera, motion_inform, live_feedback_on, voice_on, root):
             _, thresh = cv2.threshold(mod, 100, 255, 0)
             # calculate st dev test
             _, stDev = cv2.meanStdDev(mod)
-            if time.time() - current > 15 and live_feedback_on:
+            if time.time() - current > 15:
                 print("please move")
-                root.config(bg="dark orange")
+                if live_feedback_on:
+                    root.config(bg="dark orange")
                 current = time.time()
                 if voice_on:
                     load_speech("You should gesture more.")
@@ -134,9 +135,42 @@ def capture_motion(camera, motion_inform, live_feedback_on, voice_on, root):
                 break
         except:
             break
-    camera.release()
+    #camera.release()
     cv2.destroyAllWindows()
     print("Done")
+
+def capture_motion_2(camera):
+    sdThresh = 9
+    def distMap(frame1, frame2):
+        """outputs pythagorean distance between two frames"""
+        frame1_32 = np.float32(frame1)
+        frame2_32 = np.float32(frame2)
+        diff32 = frame1_32 - frame2_32
+        norm32 = np.sqrt(diff32[:, :, 0] ** 2 + diff32[:, :, 1] ** 2 + diff32[:, :, 2] ** 2) / np.sqrt(
+            255 ** 2 + 255 ** 2 + 255 ** 2)
+        dist = np.uint8(norm32 * 255)
+        return dist
+    _, frame1 = camera.read()
+    _, frame2 = camera.read()
+    try:
+        _, frame3 = camera.read()
+        rows, cols, _ = np.shape(frame3)
+        dist = distMap(frame1, frame3)
+        frame1 = frame2
+        frame2 = frame3
+        # apply Gaussian smoothing
+        mod = cv2.GaussianBlur(dist, (9, 9), 0)
+        # apply thresholding
+        _, thresh = cv2.threshold(mod, 100, 255, 0)
+        # calculate st dev test
+        _, stDev = cv2.meanStdDev(mod)
+        if stDev > sdThresh:
+            #print("Motion detected")
+            return True
+    except:
+        return
+    #camera.release()
+    #cv2.destroyAllWindows()
 
 def analyze_gesture(thresh, model, graph, session, output_dic, live_feedback_on):
     # copies 1 channel BW image to all 3 RGB channels
@@ -147,10 +181,11 @@ def analyze_gesture(thresh, model, graph, session, output_dic, live_feedback_on)
         with session.as_default():
             prediction, score = predict_rgb_image_vgg(model, target)
             prediction = gesture_names[prediction]
-            if prediction == 'Fist':
-                print('Fist')
+            print(prediction, score)
+            if prediction == 'Fist' and score > 90:
+                return "Fist"
             elif prediction == 'Okay':
-                print("Okay")
+                return "Okay"
             else:
                 pass
 

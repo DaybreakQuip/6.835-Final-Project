@@ -64,8 +64,9 @@ def check_speech_rate(audio_filename, desired_rate, output_dic, live_feedback_on
     current = time.time()
     sr = convert_to_words_per_min(get_speech_rate(audio_filename))
     output_dic["AVG_SPEECH_RATE"] = (output_dic["AVG_SPEECH_RATE"] + sr) / 2.
-    if sr > desired_rate and live_feedback_on:
-        root.config(bg="red")
+    if sr > desired_rate:
+        if live_feedback_on:
+            root.config(bg="red")
         current = time.time()
         if voice_on:
             load_speech("You are speaking too fast. Speak slower.")
@@ -86,13 +87,13 @@ def check_filler_words(audio_filename, forbidden_words, output_dic, live_feedbac
     if illegals:
         if live_feedback_on:
             root.config(bg="khaki")
-            if voice_on:
-                if len(illegals) > 1:
-                    load_speech(f"Careful, you said the word {', '.join(illegals[:-1])} and {illegals[-1]}.")
-                else:
-                    load_speech(f"Careful, you said the word {illegals[-1]}.")
-                unload_speech()
-            output_dic["SAID_ILLEGALS"] = list(set(output_dic["SAID_ILLEGALS"].append(illegals)))
+        if voice_on:
+            if len(illegals) > 1:
+                load_speech(f"Careful, you said the word {', '.join(illegals[:-1])} and {illegals[-1]}.")
+            else:
+                load_speech(f"Careful, you said the word {illegals[-1]}.")
+            unload_speech()
+        output_dic["SAID_ILLEGALS"] = list(set(output_dic["SAID_ILLEGALS"].append(illegals)))
     while time.time() - current < 3:
         pass
     root.config(bg="#F0F0F0")
