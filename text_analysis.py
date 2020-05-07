@@ -65,7 +65,7 @@ def check_speech_rate(audio_filename, desired_rate, output_dic, live_feedback_on
     sr = convert_to_words_per_min(get_speech_rate(audio_filename))
     output_dic["AVG_SPEECH_RATE"] = (output_dic["AVG_SPEECH_RATE"] + sr) / 2.
     if sr > desired_rate:
-        if live_feedback_on:
+        if live_feedback_on and root["background"] == "#F0F0F0":
             root.config(bg="red")
         current = time.time()
         if voice_on:
@@ -85,7 +85,7 @@ def check_filler_words(audio_filename, forbidden_words, output_dic, live_feedbac
         return
     illegals = list(set(words).intersection(forbidden_words))
     if illegals:
-        if live_feedback_on:
+        if live_feedback_on and root["background"] == "#F0F0F0":
             root.config(bg="khaki")
         if voice_on:
             if len(illegals) > 1:

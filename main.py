@@ -240,6 +240,7 @@ positionRight = int(root.winfo_screenwidth()/2 - windowWidth/2) - 60
 positionDown = int(root.winfo_screenheight()/4 - windowHeight/4) - 50
 
 root.geometry("300x600""+{}+{}".format(positionRight, positionDown))
+root.config(bg="#F0F0F0")
 title = Label(root, text="6.UAssist")
 timer = Label(root, text="00:00:00", font=("Courier", 35))
 
@@ -268,7 +269,6 @@ title.pack(side=TOP, pady = 100)
 timer.pack(side=TOP, pady= 10)
 settings.pack(side=BOTTOM, pady=5)
 switch.pack(side=BOTTOM, pady=5)
-
 update_timer()
 threading.Thread(target=gesture_start_thread).start()
 mainloop()

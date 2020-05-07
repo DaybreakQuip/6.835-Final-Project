@@ -121,7 +121,7 @@ def capture_motion(camera, motion_inform, live_feedback_on, voice_on, root):
             _, stDev = cv2.meanStdDev(mod)
             if time.time() - current > 15:
                 print("please move")
-                if live_feedback_on:
+                if live_feedback_on and root["background"] == "#F0F0F0":
                     root.config(bg="dark orange")
                 current = time.time()
                 if voice_on:
@@ -140,7 +140,7 @@ def capture_motion(camera, motion_inform, live_feedback_on, voice_on, root):
     print("Done")
 
 def capture_motion_2(camera):
-    sdThresh = 9
+    sdThresh = 11
     def distMap(frame1, frame2):
         """outputs pythagorean distance between two frames"""
         frame1_32 = np.float32(frame1)
