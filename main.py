@@ -124,6 +124,7 @@ def record_thread():
         counter += 1
     switch.configure(text="Start", command=start_command, state=NORMAL, bg="#BBFAC7")
     settings.configure(state=NORMAL)
+    root.config(bg="#F0F0F0")
     recorder_thread = None
     threading.Thread(target=gesture_start_thread).start()
     exit_handler_thread = threading.Thread(target=stop_thread,args=())
@@ -155,7 +156,7 @@ def stop_thread():
             print(e)
             print("Unable to find/delete certain tmp files")
             continue
-
+    root.config(bg="#F0F0F0")
     output.close()
 
     ##############
