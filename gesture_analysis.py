@@ -181,11 +181,8 @@ def analyze_gesture(thresh, model, graph, session, output_dic, live_feedback_on)
         with session.as_default():
             prediction, score = predict_rgb_image_vgg(model, target)
             prediction = gesture_names[prediction]
-            print(prediction, score)
-            if prediction == 'Fist' and score > 90:
-                return "Fist"
-            elif prediction == 'Okay':
-                return "Okay"
+            if prediction == 'Palm' and score > 60:
+                return "Open Palm Detected"
             else:
                 pass
 

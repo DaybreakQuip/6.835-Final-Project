@@ -111,13 +111,14 @@ def stop_thread(root):
 
     last_file_counter = temp
 
-    if setting_params["CAN_SEND_EMAIL"]:
-        send_message(compose_message(output_dic), setting_params["RECEIVER_EMAILS"])
-
     if setting_params["GET_SUMMARY"] and setting_params["username"] != "":
         with open(setting_params["username"] + ".json", "r") as f:
             logs = json.load(f)
             compose_summary(logs)
+            
+    if setting_params["CAN_SEND_EMAIL"]:
+        send_message(compose_message(output_dic), setting_params["RECEIVER_EMAILS"])
+
 
 def settings_click(root, camera, switch, settings, positionRight, positionDown):
     global UI_open

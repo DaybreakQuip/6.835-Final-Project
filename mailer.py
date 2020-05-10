@@ -1,6 +1,10 @@
 import smtplib, ssl
 import sys
 import json
+import matplotlib.style as style
+import matplotlib.pyplot as plt
+
+style.use("ggplot")
 
 PORT = 465
 SMTP_SERVER = "smtp.gmail.com"
@@ -24,7 +28,13 @@ def compose_message(output_dic):
     return "".join(lines)
 
 def compose_summary(logs):
-    print("compose_summary invoked")
+    plt.figure()
+    plt.title("Average Speech Rate over Sessions")
+    plt.xlabel("Sessions")
+    plt.ylabel("Average Rate of Speech [ wpm ]")
+    plt.plot([logs[d]["AVG_SPEECH_RATE"] for d in logs])
+    plt.show()
+
 
 def send_message(message, RECEIVER_EMAILS, SENDER_EMAIL_PASSWORD=SENDER_EMAIL_PASSWORD):
     context = ssl.create_default_context()
