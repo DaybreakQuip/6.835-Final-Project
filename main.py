@@ -30,6 +30,7 @@ switch = Button(root, text='Start', height=2, width= 20, bg="#BBFAC7",font=("Cou
 settings = Button(root, text='Settings', height=2, width=30, bg="#AEAEAE",font=("Courier", 10))
 settings.config(command= lambda: settings_click(root, camera, switch, settings, positionRight, positionDown))
 switch.config(command=lambda: start_command(root, camera, switch, settings))
+root.config(bg="#F0F0F0")
 def on_closing():
     root.destroy()
     UI_open[0] = False
