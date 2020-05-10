@@ -104,7 +104,7 @@ def stop_thread(root):
 
     ##############
 
-    get_text_feedback("summary.wav", root) if not setting_params["live_feedback_on"] else None
+    get_text_feedback("summary.wav", root) if not (setting_params["live_feedback_on"] or setting_params["voice_on"]) else None
 
     today_string = str(datetime.now())
     update_log(today_string) if setting_params["username"] != "" else None
