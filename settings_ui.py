@@ -4,6 +4,8 @@ from tkinter.ttk import Combobox
 import json
 import os
 
+
+
 setting_params = {"forbidden": [],
                   "username": "daboki",
                   "desired_rate_mode": "slow",
@@ -20,6 +22,17 @@ if not os.path.exists("settings.json"):
 else:
     with open('settings.json') as f:
         setting_params = json.load(f)
+
+desired_rate = 180 if setting_params["desired_rate_mode"] == "fast" else 150 # we will have two categories: slow or fast. slow -> 150, fast -> 180
+
+output_dic = {"AVG_SPEECH_RATE": 130., "SAID_ILLEGALS": [], "MOOD": {
+    "angry": 0,
+    "disgust": 0,
+    "fear": 0,
+    "sad": 0,
+    "surprise": 0,
+    "neutral": 0,
+}}
 
 def update_settings():
     with open('settings.json', 'w') as outfile:
@@ -128,3 +141,17 @@ def settings_win(root, positionRight, positionDown):
     settings_window.transient(root)
     settings_window.grab_set()
     root.wait_window(settings_window)
+
+def update_log(today_string):
+    try:
+        with open(setting_params["username"] + ".json", "r+") as f:
+            logs = json.load(f)
+            f.seek(0)
+            f.truncate()
+            logs[today_string] = output_dic
+            json.dump(logs, f)
+    except:
+        with open(setting_params["username"] + ".json", "w+") as f:
+            logs = {}
+            logs[today_string] = output_dic
+            json.dump(logs, f)

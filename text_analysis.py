@@ -73,7 +73,10 @@ def check_speech_rate(audio_filename, desired_rate, output_dic, live_feedback_on
             unload_speech()
     while time.time() - current < 3:
         pass
-    root.config(bg="#F0F0F0")
+    try:
+        root.config(bg="#F0F0F0")
+    except:
+        pass
 
 def check_filler_words(audio_filename, forbidden_words, output_dic, live_feedback_on, voice_on, root):
     default_forbiddens = ["so", "um", "like", "literally", "basically", "well"]
@@ -93,9 +96,13 @@ def check_filler_words(audio_filename, forbidden_words, output_dic, live_feedbac
             else:
                 load_speech(f"Careful, you said the word {illegals[-1]}.")
             unload_speech()
-        output_dic["SAID_ILLEGALS"] = list(set(output_dic["SAID_ILLEGALS"].append(illegals)))
+        output_dic["SAID_ILLEGALS"].extend(illegals)
+        output_dic["SAID_ILLEGALS"] = list(set(output_dic["SAID_ILLEGALS"]))
     while time.time() - current < 3:
         pass
-    root.config(bg="#F0F0F0")
+    try:
+        root.config(bg="#F0F0F0")
+    except:
+        pass
 
 
