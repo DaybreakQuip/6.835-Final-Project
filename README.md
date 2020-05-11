@@ -20,3 +20,9 @@
 16. **timer_handler.py** - file for the stopwatch shown in the UI.
 17. **daboki.json** - file containing user data.
 18. **abstract-img.png** - image for UI.
+
+## Instructions for Running
+1. Make sure that you have Python version 3.7.0 or higher (not 3.8).
+2. Use a Windows machine.
+3. Install all the required libraries as defined in requirements.txt.
+4. Run main.py.
