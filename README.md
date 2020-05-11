@@ -1,5 +1,5 @@
 # 6.835-Final-Project
-6.835 Final Project 6.UAssist
+6.835 Final Project: 6.UAssist
 ## Table of Contents
 
 1. **main.py** - Run this file to start our system. This file initializes the main UI, which also links to the different functions in the other files. It also initalizes the camera used in gesture/motion detection.
