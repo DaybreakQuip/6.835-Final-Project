@@ -2,7 +2,7 @@ absl-py==0.7.0
 astor==0.8.1
 audioread==2.1.8
 beautifulsoup4==4.6.0
-bleach==1.5.0
+bleach==3.3.0
 certifi==2020.4.5.1
 cffi==1.14.0
 chardet==3.0.4
